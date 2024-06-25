@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: songs-deployment
+  namespace: songs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: songs-app
+  template:
+    metadata:
+      labels:
+        app: songs-app
+    spec:
+      containers:
+        - name: songs-app
+          image: nikola31/songs-kiii-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_DATASOURCE_URL
+            - name: SPRING_H2_CONSOLE_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_H2_CONSOLE_ENABLED
+            - name: SPRING_H2_CONSOLE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_H2_CONSOLE_PATH
+            - name: SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION
+            - name: SPRING_H2_CONSOLE_SETTINGS_TRACE
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_H2_CONSOLE_SETTINGS_TRACE
+            - name: SPRING_SQL_INIT_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_SQL_INIT_MODE
+            - name: SPRING_SQL_INIT_PLATFORM
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_SQL_INIT_PLATFORM
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              valueFrom:
+                configMapKeyRef:
+                  name: songs-app-config
+                  key: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+            
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: SPRING_DATASOURCE_PASSWORD
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: create
+          livenessProbe:
+            exec:
+              command: [ "pg_isready", "-U", "postgres","-d","Songs-KIII" ]
+            initialDelaySeconds: 10
+            periodSeconds: 10
