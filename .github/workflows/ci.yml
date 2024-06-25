@@ -36,7 +36,7 @@ jobs:
         with:
           context: ./
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sticky-notes-spring-kiii:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/songs-kiii-backend:latest
 
   integration-test:
     runs-on: ubuntu-latest
